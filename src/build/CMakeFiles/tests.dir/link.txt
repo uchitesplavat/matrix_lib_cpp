@@ -1,0 +1,1 @@
+/usr/lib64/ccache/c++ -O3 -DNDEBUG CMakeFiles/tests.dir/tests/test_matrix.cpp.o CMakeFiles/tests.dir/tests/test_runner.cpp.o -o tests  /usr/lib64/libgtest_main.so.1.12.1 s21_matrix_oop.a /usr/lib64/libgtest.so.1.12.1 

@@ -1,10 +1,23 @@
 #include "s21_matrix_oop.h"
 
+//int main() {
+//    S21Matrix m;
+//    m.set_cols(2);
+//    m(0,1) = 10;
+//    for (int i = 0; i < m.get_rows(); ++i)
+//        for (int j = 0; j < m.get_cols(); ++j) {
+//            std::cout << m(i, j) << " ";
+//            if (j == m.get_cols() - 1){
+//                std::cout << "\n";
+//            }
+//        }
+//    return 0;
+//}
 //  Default constructor (4X4)
 S21Matrix::S21Matrix() : _rows(4), _cols(4){
     _p = new double *[_rows];
     for(int i = 0; i < _rows; i++) {
-        _p[i] = new double[_cols];
+        _p[i] = new double[_cols]();
     }
 }
 
@@ -16,16 +29,21 @@ S21Matrix::S21Matrix(int rows, int cols) : _rows(rows), _cols(cols){
     }
     _p = new double *[_rows];
     for(int i = 0; i < _rows; i++) {
-        _p[i] = new double[_cols];
+        _p[i] = new double[_cols]();
     }
 }
 
 //This constructor generates a copy of a specified matrix
 //The use of the ':' syntax in this case invokes another member function
 S21Matrix::S21Matrix(const S21Matrix& other)
-    : S21Matrix::S21Matrix(other._rows, other._cols) {
-    std::copy(&other._p, &other._p + _rows * _cols, &_p);
+        : S21Matrix::S21Matrix(other._rows, other._cols) {
+
+//        std::copy(&other._p, &other._p + i * j, &_p);
+
+    for (int i = 0; i < _rows; ++i)
+        for (int j = 0; j < _cols; ++j) _p[i][j] = other._p[i][j];
 }
+
 
 //This constructor move the matrix from the given to this one
 //P.S.
@@ -34,8 +52,8 @@ S21Matrix::S21Matrix(const S21Matrix& other)
 //"x" is assigned the value of "y",
 //"z" is assigned the value that "x" had initially.
 S21Matrix::S21Matrix(S21Matrix&& other)
-    : _rows(std::exchange(other._rows, 0)), _cols(std::exchange(other._cols, 0)),
-    _p(std::exchange(other._p, nullptr)){}
+        : _rows(std::exchange(other._rows, 0)), _cols(std::exchange(other._cols, 0)),
+          _p(std::exchange(other._p, nullptr)){}
 //    _rows = std::exchange(other._rows, 0);
 //    _cols = std::exchange(other._cols, 0);
 //    _p = std::exchange(other._p, nullptr);
@@ -93,7 +111,7 @@ void S21Matrix::set_cols(int cols) {
             // Allocate a new array of double with 'cols' elements, initialized to 0.0
             double* pi_temp = new double[cols]();
             // Copy the elements from the old array to the new one
-            std::copy(_p[i], _p[i] + _cols, pi_temp);
+            std::copy(_p[i], _p[i] + cols, pi_temp);
             // Free the memory of the old array
             delete[] _p[i];
             // Replace the old array with the new one
@@ -112,3 +130,28 @@ int S21Matrix::get_cols() const noexcept {
 return _cols;
 }
 
+// mutator of matrix values
+double& S21Matrix::operator()(int rows, int cols) {
+    if (rows >= _rows || cols >= _cols || cols < 0 || rows < 0)
+        throw std::out_of_range("Invalid input, index exceeds valid range");
+    return _p[rows][cols];
+}
+
+// accessor of matrix values
+double& S21Matrix::operator()(int rows, int cols) const {
+    if (rows >= _rows || cols >= _cols || cols < 0 || rows < 0)
+        throw std::out_of_range("Invalid input, index exceeds valid range");
+    return _p[rows][cols];
+}
+
+// This operator assign other matrix to *this
+S21Matrix& S21Matrix::operator=(const S21Matrix& other) {
+//    "Prevention of self-assignment"
+    if (this == &other) return *this;
+    this->set_cols(other._cols);
+    this->set_rows(other._rows);
+    for (int i = 0; i < _rows; ++i)
+        for (int j = 0; j < _cols; ++j)
+            _p[i][j] = other._p[i][j];
+    return *this;
+}

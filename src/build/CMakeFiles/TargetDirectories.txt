@@ -1,0 +1,5 @@
+/home/up/github/matrix_lib_cpp/src/build/CMakeFiles/s21_matrix_oop.dir
+/home/up/github/matrix_lib_cpp/src/build/CMakeFiles/tests.dir
+/home/up/github/matrix_lib_cpp/src/build/CMakeFiles/test.dir
+/home/up/github/matrix_lib_cpp/src/build/CMakeFiles/edit_cache.dir
+/home/up/github/matrix_lib_cpp/src/build/CMakeFiles/rebuild_cache.dir
