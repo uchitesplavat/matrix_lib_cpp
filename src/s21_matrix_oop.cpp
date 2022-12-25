@@ -8,7 +8,8 @@
 //    m.set_rows(6);
 //    m1.set_rows(6);
 //    m(0,1) = 10;
-//    m1(0,1) = 10;
+//    m1(0,1) = 12;
+//
 //    for (int i = 0; i < m.get_rows(); ++i)
 //        for (int j = 0; j < m.get_cols(); ++j) {
 //            std::cout << m(i, j) << " ";
@@ -23,8 +24,16 @@
 //                std::cout << "\n";
 //            }
 //        }
-//    bool test = m.EqMatrix(m1);
-//    std::cout << test << " ";
+//    m.SumMatrix(m1);
+//    for (int i = 0; i < m.get_rows(); ++i)
+//        for (int j = 0; j < m.get_cols(); ++j) {
+//            std::cout << m(i, j) << " ";
+//            if (j == m.get_cols() - 1){
+//                std::cout << "\n";
+//            }
+//        }
+////    bool test = m.EqMatrix(m1);
+////    std::cout << test << " ";
 //    return 0;
 //
 //}
@@ -197,3 +206,48 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) {
     return res;
 }
 
+void S21Matrix::SumMatrix(const S21Matrix& other) {
+    if (_cols != other._cols || _rows != other._rows) {
+        // If the number of rows and columns are not the same
+        throw std::out_of_range("Rows and columns are not the same");
+    }
+    for (int i = 0; i < _rows; i++)
+        for (int j = 0; j < _cols; j++) {
+            _p[i][j] += other._p[i][j];
+        }
+}
+
+void S21Matrix::SubMatrix(const S21Matrix& other) {
+    if (_cols != other._cols || _rows != other._rows) {
+        // If the number of rows and columns are not the same
+        throw std::out_of_range("Rows and columns are not the same");
+    }
+    for (int i = 0; i < _rows; i++)
+        for (int j = 0; j < _cols; j++) {
+            _p[i][j] -= other._p[i][j];
+        }
+}
+
+void S21Matrix::MulNumber(const double num) {
+    for (int i = 0; i < _rows; i++)
+        for (int j = 0; j < _cols; j++) {
+            _p[i][j] *= num;
+        }
+}
+
+void S21Matrix::MulMatrix(const S21Matrix& other) {
+    if (_cols != other._rows) {
+        throw std::out_of_range("Multiply matrix only when first matrix cols == second matrix rows");
+    }
+    S21Matrix copy(*this);
+    set_cols(other._cols);
+    for (int i = 0; i < _rows; i++) {
+        for (int j = 0; j < _cols; j++) {
+            double sum = 0;
+            for (int k = 0; k < copy._cols; ++k) {
+                sum += copy._p[i][k] * other._p[k][j];
+            }
+            _p[i][j] = sum;
+        }
+    }
+}

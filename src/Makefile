@@ -11,6 +11,6 @@ $(OUT):
 
 $(TEST): $(OUT)
 	$(MAKE) -C $(OUT_DIR) tests
-
+	cd build
 clean:
 	rm -rf $(OUT_DIR)

@@ -23,13 +23,17 @@ public:
 
     int get_rows() const noexcept;
     int get_cols() const noexcept;
-    void set_rows(int32_t rows);
-    void set_cols(int32_t cols);
+    void set_rows(int rows);
+    void set_cols(int cols);
 
     double& operator()(int rows, int cols);
     double& operator()(int rows, int cols) const;
     S21Matrix& operator=(const S21Matrix& other);
     bool EqMatrix(const S21Matrix& other);
+    void SumMatrix(const S21Matrix& other);
+    void SubMatrix(const S21Matrix& other);
+    void MulNumber(const double num);
+    void MulMatrix(const S21Matrix& other);
 };
 
 

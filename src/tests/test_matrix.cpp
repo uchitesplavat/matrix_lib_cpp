@@ -84,7 +84,7 @@ for (int i = 0; i < m2.get_rows(); ++i)
 for (int j = 0; j < m2.get_cols(); ++j)
 EXPECT_DOUBLE_EQ(0, m2(i, j));
 
-//ASSERT_ANY_THROW(m1.set_rows(0));
+ASSERT_ANY_THROW(m1.set_rows(-1));
 }
 
 TEST(test_class, SetColsTest) {
@@ -92,17 +92,11 @@ S21Matrix m1;
 S21Matrix m2;
 m1.set_cols(2);
 EXPECT_EQ(2, m1.get_cols());
-for (int i = 0; i < m1.get_rows(); ++i)
-for (int j = 0; j < m1.get_cols(); ++j)
-EXPECT_DOUBLE_EQ(0, m1(i, j));
 
-m2.set_cols(2);
-EXPECT_EQ(2, m2.get_cols());
-for (int i = 0; i < m2.get_rows(); ++i)
-for (int j = 0; j < m2.get_cols(); ++j)
-EXPECT_DOUBLE_EQ(0, m2(i, j));
+m2.set_cols(25);
+EXPECT_EQ(25, m2.get_cols());
 
-ASSERT_ANY_THROW(m1.set_cols(0));
+ASSERT_ANY_THROW(m1.set_cols(-1));
 }
 
 TEST(test_class, EqTest) {
@@ -111,4 +105,70 @@ S21Matrix m2;
 EXPECT_TRUE(m1.EqMatrix(m2));
 m2(0, 2) = 10;
 EXPECT_FALSE(m1.EqMatrix(m2));
+}
+
+TEST(test_class, AddTest) {
+S21Matrix m1;
+S21Matrix m2;
+    m1.set_cols(6);
+    m2.set_cols(6);
+    m1.set_rows(6);
+    m2.set_rows(6);
+    m1(0,1) = 10;
+    m2(0,1) = 12;
+m1.SumMatrix(m2);
+S21Matrix m3(10, 10);
+EXPECT_DOUBLE_EQ(22, m1(0, 1));
+
+ASSERT_ANY_THROW(m1.SumMatrix(m3));
+}
+
+TEST(test_class, DivTest) {
+S21Matrix m1;
+S21Matrix m2;
+m1.set_cols(6);
+m2.set_cols(6);
+m1.set_rows(6);
+m2.set_rows(6);
+m1(0,1) = 10;
+m2(0,1) = 12;
+m1.SubMatrix(m2);
+S21Matrix m3(10, 10);
+EXPECT_DOUBLE_EQ(-2, m1(0, 1));
+
+ASSERT_ANY_THROW(m1.SumMatrix(m3));
+}
+
+TEST(test_class, MulNumberTest) {
+    int number = 6;
+S21Matrix m1;
+m1.set_cols(6);
+m1.set_rows(6);
+m1(0,1) = 10;
+m1.MulNumber(number);
+EXPECT_DOUBLE_EQ(60, m1(0, 1));
+}
+
+TEST(test_class, MulMatrixTest) {
+S21Matrix m1;
+S21Matrix m2;
+m1.set_cols(6);
+m2.set_rows(6);
+m1(0,0) = 2;
+m1(0,1) = 1;
+m1(1,0) = -3;
+m1(1,1) = 0;
+m1(2,0) = 4;
+m1(2,1) = -1;
+m2(0,0) = 5;
+m2(0,1) = -1;
+m2(0,2) = 6;
+m2(1,0) = -3;
+m2(1,1) = 0;
+m2(1,2) = 7;
+
+m1.MulMatrix(m2);
+EXPECT_DOUBLE_EQ(7, m1(0, 0));
+EXPECT_DOUBLE_EQ(3, m1(1, 1));
+EXPECT_DOUBLE_EQ(17, m1(2, 2));
 }
