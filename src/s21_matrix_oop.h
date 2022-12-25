@@ -6,6 +6,7 @@
 #include <utility>
 #include <stdexcept>
 #include <iostream>
+#include <cstring>
 
 class S21Matrix {
 private:
@@ -28,6 +29,7 @@ public:
     double& operator()(int rows, int cols);
     double& operator()(int rows, int cols) const;
     S21Matrix& operator=(const S21Matrix& other);
+    bool EqMatrix(const S21Matrix& other);
 };
 
 

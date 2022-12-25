@@ -2,8 +2,13 @@
 
 //int main() {
 //    S21Matrix m;
-//    m.set_cols(2);
+//    S21Matrix m1;
+//    m.set_cols(6);
+//    m1.set_cols(6);
+//    m.set_rows(6);
+//    m1.set_rows(6);
 //    m(0,1) = 10;
+//    m1(0,1) = 10;
 //    for (int i = 0; i < m.get_rows(); ++i)
 //        for (int j = 0; j < m.get_cols(); ++j) {
 //            std::cout << m(i, j) << " ";
@@ -11,7 +16,17 @@
 //                std::cout << "\n";
 //            }
 //        }
+//    for (int i = 0; i < m1.get_rows(); ++i)
+//        for (int j = 0; j < m1.get_cols(); ++j) {
+//            std::cout << m1(i, j) << " ";
+//            if (j == m1.get_cols() - 1){
+//                std::cout << "\n";
+//            }
+//        }
+//    bool test = m.EqMatrix(m1);
+//    std::cout << test << " ";
 //    return 0;
+//
 //}
 //  Default constructor (4X4)
 S21Matrix::S21Matrix() : _rows(4), _cols(4){
@@ -90,36 +105,35 @@ void S21Matrix::set_rows(int rows) {
 }
 
 void S21Matrix::set_cols(int cols) {
-    if (cols <= 0)
+    if (cols < 0)
         throw std::length_error("It is not possible for the size of an array to be zero");
-
-//    if (cols != _cols) {
-//        for (int32_t i = 0; i < _rows; i++) {
-//            double *pi_temp = new double[cols]();
-//            for (int32_t j = 0; j < cols; ++j) {
-//                if (j < _cols)
-//                    pi_temp[j] = _p[i][j];
-//            }
-//            delete[] _p[i];
-//            _p[i] = pi_temp;
-//        }
-//        _cols = cols;
-//    }
 
     if (cols != _cols) {
         for (int i = 0; i < _rows; i++) {
-            // Allocate a new array of double with 'cols' elements, initialized to 0.0
-            double* pi_temp = new double[cols]();
-            // Copy the elements from the old array to the new one
-            std::copy(_p[i], _p[i] + cols, pi_temp);
-            // Free the memory of the old array
+            double *pi_temp = new double[cols]();
+            for (int j = 0; j < cols; ++j) {
+                if (j < _cols)
+                    pi_temp[j] = _p[i][j];
+            }
             delete[] _p[i];
-            // Replace the old array with the new one
             _p[i] = pi_temp;
         }
-        // Update the number of columns
         _cols = cols;
     }
+
+//    if (cols != _cols) {
+//        for (int i = 0; i < _rows; i++) {
+//            // Allocate a new array of double with 'cols' elements, initialized to 0.0
+//            double* pi_temp = new double[cols]();
+//            // Copy the elements from the old array to the new one
+//            std::copy(_p[i], _p[i] + cols, pi_temp);
+//            // Free the memory of the old array
+//            delete[] _p[i];
+//            // Replace the old array with the new one
+//            _p[i] = pi_temp;
+//        }
+//        // Update the number of columns
+//        _cols = cols;
 }
 
 int S21Matrix::get_rows() const noexcept {
@@ -144,14 +158,42 @@ double& S21Matrix::operator()(int rows, int cols) const {
     return _p[rows][cols];
 }
 
-// This operator assign other matrix to *this
+// This function assigns the values of the other matrix to the current matrix
 S21Matrix& S21Matrix::operator=(const S21Matrix& other) {
 //    "Prevention of self-assignment"
-    if (this == &other) return *this;
+    if (this == &other)
+        // If the current matrix is the same as the other matrix, return the current matrix
+        return *this;
+    // Set the number of columns of the current matrix to the number of columns of the other matrix
     this->set_cols(other._cols);
+    // Set the number of rows of the current matrix to the number of rows of the other matrix
     this->set_rows(other._rows);
+    // Copy the values of the other matrix to the current matrix
     for (int i = 0; i < _rows; ++i)
         for (int j = 0; j < _cols; ++j)
             _p[i][j] = other._p[i][j];
+    // Return the current matrix
     return *this;
 }
+
+bool S21Matrix::EqMatrix(const S21Matrix& other) {
+    // This function compares the current matrix with the other matrix
+    // and returns true if they are equal, false otherwise
+    // are equal, false otherwise
+    bool res = true;
+    // Check if the number of rows and columns are the same in both matrices
+    if (_cols != other._cols || _rows != other._rows) {
+        // If the number of rows and columns are not the same, return false
+        res = false;
+    }
+    for (int i = 0; i < _rows; i++) {
+        // Use memcmp to compare the memory of the underlying arrays
+        if (memcmp(_p[i], other._p[i], sizeof(_p[i]) * _cols) != 0) {
+            // If memcmp returns a non-zero value, the arrays are not equal, so return false
+            res = false;
+        }
+    }
+//    res = memcmp(_p[0], other._p[0], sizeof(_p[0]) * _rows * _cols) == 0;
+    return res;
+}
+

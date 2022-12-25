@@ -1,2 +1,0 @@
-/usr/bin/ar qc s21_matrix_oop.a CMakeFiles/s21_matrix_oop.dir/s21_matrix_oop.cpp.o
-/usr/bin/ranlib s21_matrix_oop.a

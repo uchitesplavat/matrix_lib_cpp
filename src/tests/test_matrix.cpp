@@ -104,3 +104,11 @@ EXPECT_DOUBLE_EQ(0, m2(i, j));
 
 ASSERT_ANY_THROW(m1.set_cols(0));
 }
+
+TEST(test_class, EqTest) {
+S21Matrix m1;
+S21Matrix m2;
+EXPECT_TRUE(m1.EqMatrix(m2));
+m2(0, 2) = 10;
+EXPECT_FALSE(m1.EqMatrix(m2));
+}
