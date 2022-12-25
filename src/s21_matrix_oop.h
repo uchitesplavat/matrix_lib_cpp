@@ -11,8 +11,8 @@
 class S21Matrix {
 private:
     // attributes
-    int _rows, _cols;                                       // rows and columns attributes
-    double **_p;                                                // pointer to the memory where the matrix will be allocated
+    int rows_, cols_;                                       // rows and columns attributes
+    double **matrix_;                                                // pointer to the memory where the matrix will be allocated
 
 public:
     S21Matrix();                                       // default constructor
@@ -26,14 +26,33 @@ public:
     void set_rows(int rows);
     void set_cols(int cols);
 
-    double& operator()(int rows, int cols);
-    double& operator()(int rows, int cols) const;
-    S21Matrix& operator=(const S21Matrix& other);
+
     bool EqMatrix(const S21Matrix& other);
     void SumMatrix(const S21Matrix& other);
     void SubMatrix(const S21Matrix& other);
     void MulNumber(const double num);
     void MulMatrix(const S21Matrix& other);
+    S21Matrix Transpose();
+    S21Matrix CalcComplements();
+    double Determinant();
+    S21Matrix InverseMatrix();
+    void calc_complements(S21Matrix &result);
+    void get_res_matrix(S21Matrix &result);
+    double get_minor(int i, int j);
+    double det_two(S21Matrix &res);
+
+    double& operator()(int rows, int cols);
+    double& operator()(int rows, int cols) const;
+    bool operator==(const S21Matrix& other);
+    S21Matrix& operator+=(const S21Matrix& other);
+    S21Matrix operator+(const S21Matrix& other);
+    S21Matrix& operator-=(const S21Matrix& other);
+    S21Matrix operator-(const S21Matrix& other);
+    S21Matrix& operator*=(const S21Matrix& other);
+    S21Matrix operator*(const S21Matrix& other);
+    S21Matrix& operator*=(const double num);
+    S21Matrix operator*(const double num);
+    S21Matrix& operator=(const S21Matrix& other);
 };
 
 
