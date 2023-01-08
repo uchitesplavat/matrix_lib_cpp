@@ -11,18 +11,16 @@ if(CMAKE_BUILD_TYPE EQUAL "Debug")
     add_compile_options(-fsanitize=address)
     add_link_options(-fsanitize=address)
 endif()
-
-add_library(s21_matrix_oop STATIC s21_matrix_oop.cpp)
-target_compile_options(s21_matrix_oop PRIVATE -Wall -Werror -Wextra -Wpedantic)
+add_library(s21_matrix_oop STATIC s21_matrix_oop.cc)
+target_compile_options(s21_matrix_oop PRIVATE -std=c++17 -Wall -Werror -Wextra -Wpedantic)
 
 find_package(GTest REQUIRED)
 include(GoogleTest)
 enable_testing()
 
-file(GLOB SOURCES tests/*.cpp)
+file(GLOB SOURCES tests/*.cc)
 add_executable(tests ${SOURCES})
-target_compile_options(tests PRIVATE -Wall -Werror -Wextra -Wpedantic)
-
+target_compile_options(tests PRIVATE -std=c++17 -Wall -Werror -Wextra -Wpedantic)
 target_link_libraries(tests GTest::gtest_main s21_matrix_oop)
 
 gtest_discover_tests(tests)

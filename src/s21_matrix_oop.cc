@@ -28,22 +28,22 @@ S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
 S21Matrix::S21Matrix(const S21Matrix& other)
     : S21Matrix::S21Matrix(other.rows_, other.cols_) {
   //        std::copy(&other.matrix_, &other.matrix_ + i * j, &matrix_);
-
   for (int i = 0; i < rows_; ++i)
     for (int j = 0; j < cols_; ++j) matrix_[i][j] = other.matrix_[i][j];
 }
 
-// This constructor move the matrix from the given to this one
-// P.S.
-// int z = std::exchange(x, y);
-// After this line of code executes:
-//"x" is assigned the value of "y",
-//"z" is assigned the value that "x" had initially.
-S21Matrix::S21Matrix(S21Matrix&& other)
-    : rows_(std::exchange(other.rows_, 0)),
-      cols_(std::exchange(other.cols_, 0)),
-      matrix_(std::exchange(other.matrix_, nullptr)) {}
+// S21Matrix::S21Matrix(S21Matrix&& other)
+//     : rows_(std::exchange(other.rows_, 0)),
+//       cols_(std::exchange(other.cols_, 0)),
+//       matrix_(std::exchange(other.matrix_, nullptr)) {}
 
+// This constructor move the matrix from the given to this one
+S21Matrix::S21Matrix(S21Matrix&& other)
+    : rows_(other.rows_), cols_(other.cols_), matrix_(other.matrix_) {
+  other.rows_ = 0;
+  other.cols_ = 0;
+  other.matrix_ = nullptr;
+}
 
 // This destructor simply deallocates the memory of matrix_
 S21Matrix::~S21Matrix() {
@@ -221,13 +221,13 @@ S21Matrix S21Matrix::Transpose() {
   return res;
 }
 
-void S21Matrix::get_res_matrix(S21Matrix& result) {
+void S21Matrix::ResMatrix(S21Matrix& result) {
   // We iterate over the rows and columns of the result matrix and set the
   // element at each position to be the minor of the corresponding element in
   // the original matrix.
   for (int i = 0; i < result.rows_; i++) {
     for (int j = 0; j < result.cols_; j++) {
-      result(i, j) = get_minor(i, j);
+      result(i, j) = GetMinor(i, j);
     }
   }
 }
@@ -235,7 +235,7 @@ void S21Matrix::get_res_matrix(S21Matrix& result) {
 // This function calculates the minor of an element at a given position in the
 // current matrix object. The minor of an element is the determinant of the
 // matrix formed by deleting the row and column containing the element.
-double S21Matrix::get_minor(int i, int j) {
+double S21Matrix::GetMinor(int i, int j) {
   double minor = 0.0;
   // If the matrix is a 2x2 matrix, we simply set the minor to be the element
   // that is not in the same row or column as the given position.
@@ -274,13 +274,13 @@ double S21Matrix::get_minor(int i, int j) {
       // If the resulting matrix is a 2x2 matrix, we call the det_two function
       // to calculate the determinant.
     } else {
-      minor = det_two(res);
+      minor = DetTwo(res);
     }
   }
   return minor;
 }
 
-double S21Matrix::det_two(S21Matrix& res) {
+double S21Matrix::DetTwo(S21Matrix& res) {
   return res(0, 0) * res(1, 1) - res(1, 0) * res(0, 1);
 }
 
@@ -289,10 +289,10 @@ double S21Matrix::det_two(S21Matrix& res) {
 // complements is obtained by taking the complement of each element in the
 // matrix, i.e., by subtracting each element from the total number of elements
 // in the matrix.
-void S21Matrix::calc_complements(S21Matrix& result) {
+void S21Matrix::Complements(S21Matrix& result) {
   // First, we call the get_res_matrix function on the result matrix object to
   // calculate the matrix of complements.
-  get_res_matrix(result);
+  ResMatrix(result);
   // Next, we iterate over the rows and columns of the result matrix and set the
   // elements to be the complement of the corresponding element in the original
   // matrix, multiplied by (-1) raised to the power of the sum of the row and
@@ -317,11 +317,11 @@ S21Matrix S21Matrix::CalcComplements() {
   // If the matrix is a 1x1 matrix, we simply set the element in the resulting
   // matrix to be the complement of the element in the current matrix.
   if (rows_ == 1) {
-    result(0, 0) = matrix_[0][0];
+    result(0, 0) = 1;
     // If the matrix is larger than a 1x1 matrix, we call the calc_complements
     // function on the result matrix.
   } else {
-    calc_complements(result);
+    Complements(result);
   }
 
   return result;
@@ -331,27 +331,41 @@ S21Matrix S21Matrix::CalcComplements() {
 // The determinant of a matrix is a scalar value that represents the strength of
 // the matrix's contribution to a transformation.
 double S21Matrix::Determinant() {
-  // First, we check if the current matrix is a square matrix.
+  // Check that the matrix is square.
   if (rows_ != cols_) {
     throw std::logic_error("Its not a square matrix");
   }
-  double result = 0;
-  // If the matrix is a 1x1 matrix, the determinant is simply the element in the
-  // matrix.
   if (rows_ == 1) {
-    result = matrix_[0][0];
-    // If the matrix is larger than a 1x1 matrix, we need to calculate the
-    // determinant using the matrix of complements.
-  } else {
-    // Second, we calculate the matrix of complements of the current matrix.
-    S21Matrix complement = CalcComplements();
-    // Next, we iterate over the columns of the current matrix and sum up the
-    // products of the elements in the first row of the matrix of complements
-    // with the corresponding elements in the first row of the current matrix.
-    for (int i = 0; i < cols_; i++) {
-      result += complement(0, i) * matrix_[0][i];
+    return matrix_[0][0];
+  }
+  double result = 1;
+  double number = 0;
+  // Creating a copy of the current matrix to modificate it to a triangle form.
+  S21Matrix temp(*this);
+  // Matrix temp modification to triangle view.
+  for (int k = 0; k < rows_; k++) {
+    for (int i = k; i < rows_; i++) {
+      number = temp(i, k);
+      if (fabs(number) >= 1e-6) {
+        for (int j = 0; j < cols_; j++) {
+          temp(i, j) /= number;
+        }
+        result *= number;
+      } else if (i == k) {
+        return 0.0;
+      }
+    }
+    for (int i = k + 1; i < rows_; i++) {
+      if (fabs(temp(i, k) >= 1e-6)) {
+        for (int j = k; j < cols_; j++) {
+          temp(i, j) -= temp(k, j);
+        }
+      }
     }
   }
+  // Result rounding
+  result *= llround(temp(rows_ - 1, cols_ - 1) * 1e7) / 1e7;
+  result = llround(result * 1e7) / 1e7;
   return result;
 }
 
@@ -365,7 +379,7 @@ S21Matrix S21Matrix::InverseMatrix() {
   double det = Determinant();
   // If the determinant is 0, the matrix is not invertible and we throw an
   // exception.
-  if (det == 0) {
+  if (fabs(det - 0) < 1e-7) {
     throw std::logic_error("determinant of matrix == 0");
     // If the determinant is not 0, we can calculate the inverse of the matrix.
   } else {
@@ -465,6 +479,12 @@ S21Matrix S21Matrix::operator-(const S21Matrix& other) {
 S21Matrix S21Matrix::operator*(const S21Matrix& other) {
   S21Matrix res(*this);
   res.MulMatrix(other);
+  return res;
+}
+
+S21Matrix operator*(const double num, const S21Matrix& matrix) {
+  S21Matrix res(matrix);
+  res.MulNumber(num);
   return res;
 }
 
