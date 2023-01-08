@@ -131,6 +131,63 @@ TEST(test_class, EqTest) {
   EXPECT_FALSE(m1.EqMatrix(m2));
 }
 
+TEST(test_class, EqTest2) {
+  S21Matrix matrix1{4, 5};
+  S21Matrix matrix2{4, 5};
+
+  matrix1(0, 0) = 561.395;
+  matrix1(0, 1) = 356.219;
+  matrix1(0, 2) = 356.219;
+  matrix1(0, 3) = -952.484;
+  matrix1(0, 4) = -506.042;
+
+  matrix1(1, 0) = 370.469;
+  matrix1(1, 1) = 356.219;
+  matrix1(1, 2) = 356.219;
+  matrix1(1, 3) = 441.733;
+  matrix1(1, 4) = 919.346;
+
+  matrix1(2, 0) = 113.190;
+  matrix1(2, 1) = 356.219;
+  matrix1(2, 2) = 356.219;
+  matrix1(2, 3) = 577.491;
+  matrix1(2, 4) = -770.006;
+
+  matrix1(3, 0) = -629.533;
+  matrix1(3, 1) = 356.219;
+  matrix1(3, 2) = 356.219;
+  matrix1(3, 3) = 370.425;
+  matrix1(3, 4) = -226.376;
+
+  matrix2(0, 0) = 561.395;
+  matrix2(0, 1) = 356.219;
+  matrix2(0, 2) = 356.219;
+  matrix2(0, 3) = -952.484;
+  matrix2(0, 4) = -506.042;
+
+  matrix2(1, 0) = 370.469;
+  matrix2(1, 1) = 356.219;
+  matrix2(1, 2) = 356.219;
+  matrix2(1, 3) = 441.733;
+  matrix2(1, 4) = 919.346;
+
+  matrix2(2, 0) = 113.190;
+  matrix2(2, 1) = 356.219;
+  matrix2(2, 2) = 356.219;
+  matrix2(2, 3) = 577.491;
+  matrix2(2, 4) = -770.006;
+
+  matrix2(3, 0) = -629.533;
+  matrix2(3, 1) = 356.219;
+  matrix2(3, 2) = 356.219;
+  matrix2(3, 3) = 370.425;
+  matrix2(3, 4) = -226.376;
+
+  EXPECT_TRUE(matrix1.EqMatrix(matrix2));
+  matrix2(3, 4) = 10;
+  EXPECT_FALSE(matrix1.EqMatrix(matrix2));
+}
+
 TEST(test_class, AddTest) {
   S21Matrix m1;
   S21Matrix m2;

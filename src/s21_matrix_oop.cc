@@ -20,6 +20,9 @@ S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
   matrix_ = new double*[rows_];
   for (int i = 0; i < rows_; i++) {
     matrix_[i] = new double[cols_]();
+    if (matrix_[i] == nullptr) {
+      throw std::runtime_error("Allocate memory error");
+    }
   }
 }
 
@@ -61,19 +64,19 @@ void S21Matrix::set_rows(int rows) {
 
   if (rows == rows_) return;  // no changes needed
 
-  double** p = new double*[rows];
+  double** tmp = new double*[rows];
   int minrows_ = std::min(rows, rows_);  // copy values from the smaller matrix
   for (int i = 0; i < minrows_; ++i) {
-    p[i] = new double[cols_];  // allocate new row
+    tmp[i] = new double[cols_];  // allocate new row
     for (int j = 0; j < cols_; ++j)
-      p[i][j] = matrix_[i][j];  // copy values from existing row
+      tmp[i][j] = matrix_[i][j];  // copy values from existing row
   }
   // initialize new rows with default values
   for (int i = minrows_; i < rows; ++i) {
-    p[i] = new double[cols_]();
+    tmp[i] = new double[cols_]();
   }
   this->~S21Matrix();  // deallocate old matrix
-  matrix_ = p;         // update matrix with new array of row pointers
+  matrix_ = tmp;       // update matrix with new array of row pointers
   rows_ = rows;        // update number of rows
 }
 
@@ -121,20 +124,20 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) {
   // Check if the number of rows and columns are the same in both matrices
   if (cols_ != other.cols_ || rows_ != other.rows_) {
     // If the number of rows and columns are not the same, return false
-    res = false;
+    return res = false;
     //        std::cout << "here 1" << "\n";
   }
   // If they are the same, compare each element in the matrices
   for (int i = 0; i < rows_; i++) {
     //        if (memcmp(matrix_[i], other.matrix_[i], sizeof(matrix_[i]) *
     //        cols_) != 0) {
-    for (int j = 0; j < rows_; j++) {
+    for (int j = 0; j < cols_; j++) {
       // If any elements are not within 1e-7 of each other, set res to false
       // Note: "fabs" is a function that returns the absolute value of a float
       // or double. It is used here to compare the difference between two
       // elements without regard to their sign.
       if (fabs(matrix_[i][j] - other.matrix_[i][j]) > 1e-7) {
-        res = false;
+        return res = false;
         //                std::cout << "here 2" << "\n";
       }
     }
@@ -239,7 +242,7 @@ double S21Matrix::GetMinor(int i, int j) {
   double minor = 0.0;
   // If the matrix is a 2x2 matrix, we simply set the minor to be the element
   // that is not in the same row or column as the given position.
-  if (this->rows_ == 2) {
+  if (rows_ == 2) {
     for (int m = 0; m < rows_; m++) {
       for (int n = 0; n < cols_; n++) {
         if (m != i && n != j) {
@@ -274,14 +277,14 @@ double S21Matrix::GetMinor(int i, int j) {
       // If the resulting matrix is a 2x2 matrix, we call the det_two function
       // to calculate the determinant.
     } else {
-      minor = DetTwo(res);
+      minor = res.DetTwo();
     }
   }
   return minor;
 }
 
-double S21Matrix::DetTwo(S21Matrix& res) {
-  return res(0, 0) * res(1, 1) - res(1, 0) * res(0, 1);
+double S21Matrix::DetTwo() const {
+  return matrix_[0][0] * matrix_[1][1] - matrix_[1][0] * matrix_[0][1];
 }
 
 // This function calculates the matrix of complements of a matrix object passed
@@ -379,7 +382,7 @@ S21Matrix S21Matrix::InverseMatrix() {
   double det = Determinant();
   // If the determinant is 0, the matrix is not invertible and we throw an
   // exception.
-  if (fabs(det - 0) < 1e-7) {
+  if (fabs(det) < 1e-6) {
     throw std::logic_error("determinant of matrix == 0");
     // If the determinant is not 0, we can calculate the inverse of the matrix.
   } else {

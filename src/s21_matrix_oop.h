@@ -86,7 +86,7 @@ class S21Matrix {
   void Complements(S21Matrix& result);
   void ResMatrix(S21Matrix& result);
   double GetMinor(int i, int j);
-  double DetTwo(S21Matrix& res);
+  double DetTwo() const;
 };
 
 #endif  // MATRIX_LIB_CPP_S21_MATRIX_OOP_H_

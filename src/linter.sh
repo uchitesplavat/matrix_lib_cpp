@@ -1,6 +1,6 @@
 #!/bin/bash
 
-clang-format -n *.c *.h *.cpp
+clang-format -n *.c *.h *.cc *cpp
 
 while true; do
     read -r -p "Fix it? (Y/n): " answer
